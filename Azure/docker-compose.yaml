@@ -1,0 +1,39 @@
+version: '2'
+services:
+  connect:
+    image: debezium/connect:${DEBEZIUM_VERSION}
+    ports:
+     - 8083:8083
+    networks:
+      - debezium_vnet
+    volumes:
+      - "data:/data"
+    restart: always
+    environment:
+     - BOOTSTRAP_SERVERS=${EH_NAME}.servicebus.windows.net:9093
+     - GROUP_ID=1
+     - CONFIG_STORAGE_TOPIC=config_changes
+     - OFFSET_STORAGE_TOPIC=offsets_changes
+     - STATUS_STORAGE_TOPIC=statuses_changes
+     - CONNECT_KEY_CONVERTER_SCHEMAS_ENABLE=false
+     - CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE=false
+     - CONNECT_REQUEST_TIMEOUT_MS=60000
+     - CONNECT_SECURITY_PROTOCOL=SASL_SSL
+     - CONNECT_SASL_MECHANISM=PLAIN
+     - CONFIG.STORAGE.REPLICATION.FACTOR=1
+     - OFFSET.STORAGE.REPLICATION.FACTOR=1
+     - STATUS.STORAGE.REPLICATION.FACTOR=1
+     - CONNECT_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule required username="$$ConnectionString" password="${EH_CONNECTION_STRING}";
+     - CONNECT_PRODUCER_SECURITY_PROTOCOL=SASL_SSL
+     - CONNECT_PRODUCER_SASL_MECHANISM=PLAIN
+     - CONNECT_PRODUCER_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule required username="$$ConnectionString" password="${EH_CONNECTION_STRING}";
+     - CONNECT_CONSUMER_SECURITY_PROTOCOL=SASL_SSL
+     - CONNECT_CONSUMER_SASL_MECHANISM=PLAIN
+     - CONNECT_CONSUMER_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule required username="$$ConnectionString" password="${EH_CONNECTION_STRING}";
+volumes:
+  data:
+networks:
+  debezium_vnet:
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16

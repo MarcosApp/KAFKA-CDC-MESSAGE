@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@azure/eventhubs-checkpointstore-blob": "^1.0.1",
+    "@azure/storage-blob": "^12.8.0"
+  }
+}
